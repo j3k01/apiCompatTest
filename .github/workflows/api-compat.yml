@@ -21,7 +21,8 @@ jobs:
       - name: Build solution (MainApp + B)
         run: |
           dotnet restore
-          dotnet build DemoSolution.sln -c Release
+          dotnet build src/Contracts/Contracts.csproj -c Release
+          dotnet build src/MainApp/MainApp.csproj -c Release
 
       - name: Install ApiCompat (global tool)
         run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
