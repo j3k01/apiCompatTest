@@ -9,22 +9,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Build solution
+      - name: Build Contracts + Host
         run: |
           dotnet restore
-          dotnet build DemoSolution.sln -c Release
+          dotnet build src/Contracts/Contracts.csproj -c Release
+          dotnet build src/MainApp/MainApp.csproj -c Release
 
-      - name: Install ApiCompat (global tool)
+      - name: Install ApiCompat
         run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
 
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: API compatibility for Contracts
+      - name: API compatibility (Contracts)
         run: |
           LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
           RIGHT=baseline/Contracts.dll
