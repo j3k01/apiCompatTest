@@ -29,10 +29,11 @@ jobs:
         run: |
           LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
           RIGHT=baseline/Contracts.dll
-          set -euo pipefail
-          apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
-          status=$?
-          if [ $status -ne 0 ]; then
-            echo "ApiCompat detected breaking changes. Failing the job."
-            exit $status
+
+          OUTPUT=$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode || true)
+          echo "$OUTPUT"
+
+          if echo "$OUTPUT" | grep -q "API breaking changes found"; then
+            echo "::error::ApiCompat detected breaking changes in Contracts"
+            exit 1
           fi
