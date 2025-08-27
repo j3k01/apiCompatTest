@@ -1,5 +1,7 @@
 ﻿using B;
+using Contracts;
 
-Console.WriteLine($"Result: {Calculator.Add(5)}");
-Console.WriteLine($"Result: {Calculator.Add(6)}");
+ICalculator calc = new Calculator();
 
+Console.WriteLine($"Result: {calc.Add(5)}");
+Console.WriteLine($"Result: {calc.Add(6)}");
