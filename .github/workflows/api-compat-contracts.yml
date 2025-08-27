@@ -29,4 +29,10 @@ jobs:
         run: |
           LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
           RIGHT=baseline/Contracts.dll
+          set -euo pipefail
           apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
+          status=$?
+          if [ $status -ne 0 ]; then
+            echo "ApiCompat detected breaking changes. Failing the job."
+            exit $status
+          fi
