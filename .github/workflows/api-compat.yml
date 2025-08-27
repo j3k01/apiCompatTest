@@ -1,0 +1,37 @@
+name: api-compat
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "src/**"
+      - "baseline/**"
+      - ".github/workflows/api-compat.yml"
+
+jobs:
+  build-and-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build solution (MainApp + B)
+        run: |
+          dotnet restore
+          dotnet build DemoSolution.sln -c Release
+
+      - name: Install ApiCompat (local tool)
+        run: |
+          dotnet new tool-manifest || true
+          dotnet tool install Microsoft.DotNet.ApiCompat.Tool || dotnet tool update Microsoft.DotNet.ApiCompat.Tool
+
+      - name: API compatibility for B
+        run: |
+          LEFT=src/B/bin/Release/net8.0/B.dll
+          RIGHT=baseline/B.dll
+          ./.config/dotnet-tools/bin/apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
+
+
+
