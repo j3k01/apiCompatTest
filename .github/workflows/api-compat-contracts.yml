@@ -25,15 +25,23 @@ jobs:
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: API compatibility (Contracts)
-        run: |
-          LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
-          RIGHT=baseline/Contracts.dll
+        - name: API compatibility (Contracts)
+          shell: bash
+          run: |
+            LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
+            RIGHT=baseline/Contracts.dll
 
-          OUTPUT=$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode || true)
-          echo "$OUTPUT"
+            set -o pipefail
+            OUTPUT="$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode 2>&1 || true)"
+            echo "$OUTPUT"
 
-          if echo "$OUTPUT" | grep -q "API breaking changes found"; then
-            echo "::error::ApiCompat detected breaking changes in Contracts"
-            exit 1
-          fi
+            if echo "$OUTPUT" | grep -q "API breaking changes found"; then
+              echo "::error::ApiCompat detected breaking changes in Contracts"
+              exit 1
+            fi
+
+            if echo "$OUTPUT" | grep -E -q "CP0[0-9]{3}"; then
+              echo "::error::ApiCompat reported issues (CP codes present)"
+              exit 1
+            fi
+
