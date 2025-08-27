@@ -1,7 +1,16 @@
-﻿using B;
-using Contracts;
+﻿using Host.Abstractions;
+using B;
 
-ICalculator calc = new Calculator();
+sealed class TestService : ITestService
+{
+    public int Test(int x) => x + 1;
+}
 
-Console.WriteLine($"Result: {calc.Add(5)}");
-Console.WriteLine($"Result: {calc.Add(6)}");
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        var plugin = new Plugin(new TestService());
+        Console.WriteLine(plugin.DoWork(5));
+    }
+}

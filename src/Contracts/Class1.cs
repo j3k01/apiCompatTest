@@ -1,2 +1,6 @@
-﻿namespace Contracts;
-public interface ICalculator { int Add(int x, int y); }
+﻿namespace Host.Abstractions;
+
+public interface ITestService
+{
+    int Test(int x);
+}
