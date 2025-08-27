@@ -2,6 +2,7 @@ name: api-compat
 on:
   pull_request:
     branches: [ main ]
+    workflow_dispatch:
     paths:
       - "src/**"
       - "baseline/**"
