@@ -2,11 +2,11 @@ name: api-compat
 on:
   pull_request:
     branches: [ main ]
-    workflow_dispatch:
     paths:
       - "src/**"
       - "baseline/**"
       - ".github/workflows/api-compat.yml"
+  workflow_dispatch:
 
 jobs:
   build-and-compat:
@@ -23,17 +23,14 @@ jobs:
           dotnet restore
           dotnet build DemoSolution.sln -c Release
 
-    - name: Install ApiCompat (global tool)
-      run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
+      - name: Install ApiCompat (global tool)
+        run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
 
-    - name: Add dotnet tools to PATH
-      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      - name: Add dotnet tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-    - name: API compatibility for B
-      run: |
-        LEFT=src/B/bin/Release/net8.0/B.dll
-        RIGHT=baseline/B.dll
-        apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
-
-
-
+      - name: API compatibility for B
+        run: |
+          LEFT=src/B/bin/Release/net8.0/B.dll
+          RIGHT=baseline/B.dll
+          apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
