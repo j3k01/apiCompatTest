@@ -1,0 +1,31 @@
+name: api-compat-contracts
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build solution
+        run: |
+          dotnet restore
+          dotnet build DemoSolution.sln -c Release
+
+      - name: Install ApiCompat (global tool)
+        run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
+
+      - name: Add dotnet tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: API compatibility for Contracts
+        run: |
+          LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
+          RIGHT=baseline/Contracts.dll
+          apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
