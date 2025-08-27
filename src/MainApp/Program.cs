@@ -3,7 +3,7 @@ using B;
 
 sealed class TestService : ITestService
 {
-    public int Test(int x) => x + 1;
+    public int Test(int x, int y) => x + y;
 }
 
 internal class Program
