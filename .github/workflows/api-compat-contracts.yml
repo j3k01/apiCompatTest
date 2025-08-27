@@ -18,7 +18,6 @@ jobs:
         run: |
           dotnet restore
           dotnet build src/Contracts/Contracts.csproj -c Release
-          dotnet build src/MainApp/MainApp.csproj -c Release
 
       - name: Install ApiCompat
         run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
