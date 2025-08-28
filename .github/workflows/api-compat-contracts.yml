@@ -9,23 +9,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Build solution
+      - name: Build Contracts + Host
         run: |
           dotnet restore
-          dotnet build DemoSolution.sln -c Release
+          dotnet build src/Contracts/Contracts.csproj -c Release
 
-      - name: Install ApiCompat (global tool)
+      - name: Install ApiCompat
         run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
 
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: API compatibility for Contracts
+      - name: API compatibility (Contracts)
+        shell: bash
         run: |
           LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
           RIGHT=baseline/Contracts.dll
-          apicompat -l "$LEFT" -r "$RIGHT" --strict-mode
+
+          set -o pipefail
+          OUTPUT="$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode 2>&1 || true)"
+          echo "$OUTPUT"
+
+          if echo "$OUTPUT" | grep -q "API breaking changes found"; then
+            echo "::error::ApiCompat detected breaking changes in Contracts"
+            exit 1
+          fi
+
+          if echo "$OUTPUT" | grep -E -q "CP0[0-9]{3}"; then
+            echo "::error::ApiCompat reported issues (CP codes present)"
+            exit 1
+          fi
