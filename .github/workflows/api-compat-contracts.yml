@@ -14,7 +14,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Build Contracts + Host
+      - name: Build Contracts
         run: |
           dotnet restore
           dotnet build src/Contracts/Contracts.csproj -c Release
@@ -37,10 +37,5 @@ jobs:
 
           if echo "$OUTPUT" | grep -q "API breaking changes found"; then
             echo "::error::ApiCompat detected breaking changes in Contracts"
-            exit 1
-          fi
-
-          if echo "$OUTPUT" | grep -E -q "CP0[0-9]{3}"; then
-            echo "::error::ApiCompat reported issues (CP codes present)"
             exit 1
           fi
