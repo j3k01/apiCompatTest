@@ -1,0 +1,30 @@
+name: plugin-outdated
+on:
+  pull_request:
+    branches: [ main ]
+    paths: [ "src/B/**", ".github/workflows/plugin-outdated.yml" ]
+  workflow_dispatch:
+
+jobs:
+  outdated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - name: Add local feed (if present)
+        run: dotnet nuget add source ./.nupkgs --name local || true
+      - name: Check newer MAJOR of Demo.Contracts
+        shell: bash
+        run: |
+          REQ=$(dotnet list src/B/B.csproj package | awk '/Demo\.Contracts/ {print $3}')
+          LATEST=$(dotnet list src/B/B.csproj package --outdated --include-prerelease \
+                     --source ./.nupkgs --source https://api.nuget.org/v3/index.json \
+                   | awk '/Demo\.Contracts/ && /->/ {print $NF}' | tail -n1)
+          echo "Requested: $REQ"
+          echo "Latest:    $LATEST"
+          if [ -n "$LATEST" ] && [ "$(echo "$LATEST" | cut -d. -f1)" -gt "$(echo "$REQ" | cut -d. -f1)" ]; then
+            echo "::error::New MAJOR of Demo.Contracts available ($LATEST) while B pins $REQ. Update B."
+            exit 1
+          fi
+          echo "No newer MAJOR found."

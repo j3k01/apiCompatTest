@@ -1,7 +1,8 @@
-name: api-compat-contracts
+name: contracts-compat
 on:
   pull_request:
     branches: [ main ]
+    paths: [ "src/Contracts/**", "baseline/**", ".github/workflows/contracts-compat.yml" ]
   workflow_dispatch:
 
 jobs:
@@ -9,33 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+        with: { dotnet-version: '8.0.x' }
 
       - name: Build Contracts
         run: |
-          dotnet restore
-          dotnet build src/Contracts/Contracts.csproj -c Release
+          dotnet restore src/Contracts/Contracts.csproj -p:RestoreSources=https://api.nuget.org/v3/index.json
+          dotnet build src/Contracts/Contracts.csproj -c Release --no-restore
 
       - name: Install ApiCompat
         run: dotnet tool install -g Microsoft.DotNet.ApiCompat.Tool
+      - run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Add dotnet tools to PATH
-        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: API compatibility (Contracts)
+      - name: API compatibility
         shell: bash
         run: |
           LEFT=src/Contracts/bin/Release/net8.0/Contracts.dll
           RIGHT=baseline/Contracts.dll
-
           set -o pipefail
-          OUTPUT="$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode 2>&1 || true)"
-          echo "$OUTPUT"
-
-          if echo "$OUTPUT" | grep -q "API breaking changes found"; then
-            echo "::error::ApiCompat detected breaking changes in Contracts"
-            exit 1
-          fi
+          OUT="$(apicompat -l "$LEFT" -r "$RIGHT" --strict-mode 2>&1 || true)"
+          echo "$OUT"
+          if echo "$OUT" | grep -q "API breaking changes found"; then exit 1; fi
