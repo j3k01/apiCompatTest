@@ -1,3 +1,3 @@
 ﻿namespace Contracts;
-public interface ICalculator { int Add(int x, int y); }
+public interface ICalculator { int Add(int x); }
 //nothing
