@@ -15,6 +15,7 @@
 //    public string BankCode { get; set; } = string.Empty;
 //    public string Branch { get; set; } = string.Empty;
 //    public string Number { get; set; } = string.Empty;
+//    public string Code { get; set; } = string.Empty;
 //}
 
 //public static class TestExtensions
