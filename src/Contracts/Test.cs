@@ -1,9 +1,10 @@
 ﻿public class Test
 {
-    public string Test1 { get; set; } = string.Empty;
-    public string Test2 { get; set; } = string.Empty;
-    public string Test3 { get; set; } = string.Empty;
-    public string Test4 { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+    public string BankCode { get; set; } = string.Empty;
+    public string Branch { get; set; } = string.Empty;
+    public string Number { get; set; } = string.Empty;
 
-    public void Parse(int y, string ss) { Test4 = ss; } 
+    public void Parse(string ss) { Number = ss; } 
 }
+    
