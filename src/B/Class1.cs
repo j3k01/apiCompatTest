@@ -1,3 +1,10 @@
-﻿using Contracts;
-namespace B;
-public sealed class Calculator : ICalculator { public int Add(int x) => x + 1; }
+﻿namespace B;
+
+public sealed class Plugin
+{
+    public void SaveRachunek(string parseTest)
+    {
+        var parse = new Test();
+        parse.Parse(parseTest);
+    }
+}
