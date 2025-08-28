@@ -2,5 +2,5 @@
 
 public interface ITestService
 {
-    int Test(int x, int y);
+    int Test(int x);
 }
