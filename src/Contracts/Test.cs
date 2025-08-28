@@ -5,8 +5,5 @@
     public string Test3 { get; set; } = string.Empty;
     public string Test4 { get; set; } = string.Empty;
 
-    public void Parse(string ss)
-    {
-        Test4 = ss;
-    }
+    public void Parse(int y, string ss) { Test4 = ss; } 
 }
